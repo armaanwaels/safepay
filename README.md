@@ -70,7 +70,7 @@ curl -X POST http://localhost:8080/invoices \
 curl http://localhost:8080/invoices/<invoice_id>
 ```
 
-- rocess a Payment:
+- Process a Payment:
 ```
 curl -X POST http://localhost:8080/payments \
   -H "Content-Type: application/json" \

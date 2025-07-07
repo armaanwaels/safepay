@@ -11,6 +11,7 @@ A simple Go-based HTTP API for managing invoices and payments, with SQLite migra
 ---
 
 ## Project Structure
+.
 ├── main.go
 ├── handlers/
 │   ├── invoice.go
@@ -21,7 +22,10 @@ A simple Go-based HTTP API for managing invoices and payments, with SQLite migra
 ├── db/
 │   └── schema.sql
 ├── go.mod
-└── README.md
+├── go.sum
+├── README.md
+└── .gitignore
+
 
 **Requirements:**
 

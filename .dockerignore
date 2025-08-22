@@ -1,0 +1,7 @@
+.git
+.gitignore
+safepay.db
+**/*_test.go
+coverage.*
+node_modules
+.tmp

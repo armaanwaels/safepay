@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,25 +12,34 @@ import (
 )
 
 func main() {
-	// extra logging setup (file or console)
+	// Setup logging
 	log.SetOutput(os.Stdout)
 	log.Println("Safepay server starting...")
 
+	// Get DB path from environment (default: ./safepay.db)
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "./safepay.db"
+	}
+	log.Printf("Using database file: %s\n", dbPath)
+
 	// Open SQLite DB (creates file if not exists)
-	db, err := sql.Open("sqlite3", "./safepay.db")
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal("Failed to open DB:", err)
 	}
 	defer db.Close()
 
 	// Run schema migration
-	schema, err := ioutil.ReadFile("./db/schema.sql")
+	schemaPath := "./db/schema.sql"
+	schema, err := os.ReadFile(schemaPath)
 	if err != nil {
-		log.Fatal("Failed to read schema.sql:", err)
+		log.Fatalf("Failed to read %s: %v", schemaPath, err)
 	}
+
 	_, err = db.Exec(string(schema))
 	if err != nil {
-		log.Fatal("Failed to execute schema.sql:", err)
+		log.Fatalf("Failed to execute schema migration: %v", err)
 	}
 	fmt.Println("Migration ran successfully.")
 
@@ -42,8 +50,10 @@ func main() {
 	mux.HandleFunc("/payments", handlers.ProcessPaymentHandler(db))    // POST /payments
 	mux.HandleFunc("/payments/", handlers.GetPaymentStatusHandler(db)) // GET /payments/{invoice_id}
 
-	log.Println("Server running at http://localhost:8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	// Start server
+	addr := ":8080"
+	log.Printf("Server running at http://localhost%s\n", addr)
+	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
 }
